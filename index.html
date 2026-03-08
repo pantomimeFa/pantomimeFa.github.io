@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>پانتومیم</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Home Screen -->
+  <div id="screen-home" class="screen active">
+    <div class="home-container">
+      <h1 class="game-title">🎭 پانتومیم</h1>
+      <p class="game-subtitle">بازی حدس کلمات</p>
+
+      <div class="team-inputs">
+        <div class="team-input-group">
+          <label for="team1-name">تیم ۱</label>
+          <input type="text" id="team1-name" placeholder="نام تیم ۱" value="تیم ۱">
+        </div>
+        <div class="team-input-group">
+          <label for="team2-name">تیم ۲</label>
+          <input type="text" id="team2-name" placeholder="نام تیم ۲" value="تیم ۲">
+        </div>
+      </div>
+
+      <div class="mode-toggle">
+        <span class="mode-label">حالت بازی:</span>
+        <div class="toggle-buttons">
+          <button class="toggle-btn active" data-mode="normal">عادی</button>
+          <button class="toggle-btn" data-mode="fast">سریع</button>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="setting-row">
+          <label for="round-time">زمان هر نوبت (ثانیه):</label>
+          <input type="number" id="round-time" value="120" min="30" max="300" step="10">
+        </div>
+        <div class="setting-row">
+          <label for="total-rounds">تعداد دورها:</label>
+          <input type="number" id="total-rounds" value="6" min="2" max="20" step="2">
+        </div>
+      </div>
+
+      <button class="btn-primary btn-start" id="btn-start-game">شروع بازی</button>
+    </div>
+  </div>
+
+  <!-- Category Selection Screen -->
+  <div id="screen-categories" class="screen">
+    <div class="screen-header">
+      <h2 class="turn-indicator" id="turn-indicator"></h2>
+      <p class="round-info" id="round-info"></p>
+    </div>
+    <div class="categories-grid" id="categories-grid"></div>
+  </div>
+
+  <!-- Level Selection Screen -->
+  <div id="screen-levels" class="screen">
+    <div class="screen-header">
+      <h2 class="turn-indicator" id="level-turn-indicator"></h2>
+      <p id="selected-category-name" class="selected-category"></p>
+    </div>
+    <div class="levels-container">
+      <h3>سطح را انتخاب کنید</h3>
+      <div class="level-buttons">
+        <button class="level-btn" data-level="2">
+          <span class="level-num">۲</span>
+          <span class="level-label">آسان</span>
+        </button>
+        <button class="level-btn" data-level="4">
+          <span class="level-num">۴</span>
+          <span class="level-label">متوسط</span>
+        </button>
+        <button class="level-btn" data-level="6">
+          <span class="level-num">۶</span>
+          <span class="level-label">سخت</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ready Screen -->
+  <div id="screen-ready" class="screen">
+    <div class="ready-container">
+      <h2 id="ready-team-name" class="ready-team"></h2>
+      <div class="ready-info">
+        <p id="ready-category"></p>
+        <p id="ready-level"></p>
+      </div>
+      <p class="ready-hint">گوشی را به بازیکن بدهید</p>
+      <button class="btn-primary btn-go" id="btn-go">شروع</button>
+    </div>
+  </div>
+
+  <!-- Play Screen (Normal Mode) -->
+  <div id="screen-play-normal" class="screen">
+    <div class="play-container">
+      <div class="timer-section">
+        <div class="timer-circle" id="timer-circle-normal">
+          <span class="timer-text" id="timer-normal"></span>
+        </div>
+      </div>
+      <div class="word-display" id="word-normal"></div>
+      <div class="bonus-indicator" id="bonus-indicator">
+        <span class="bonus-label">امتیاز سرعت:</span>
+        <span class="bonus-value" id="bonus-value">+۳</span>
+      </div>
+      <div class="play-buttons">
+        <button class="btn-answer btn-correct" id="btn-correct-normal">✓</button>
+        <button class="btn-answer btn-fail" id="btn-fail-normal">✗</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Play Screen (Fast Mode) -->
+  <div id="screen-play-fast" class="screen">
+    <div class="play-container">
+      <div class="timer-section">
+        <div class="timer-circle" id="timer-circle-fast">
+          <span class="timer-text" id="timer-fast"></span>
+        </div>
+      </div>
+      <div class="fast-progress" id="fast-progress"></div>
+      <div class="word-display" id="word-fast"></div>
+      <div class="play-buttons">
+        <button class="btn-answer btn-correct" id="btn-correct-fast">✓</button>
+        <button class="btn-answer btn-fail" id="btn-fail-fast">✗</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Round Result Screen (Normal Mode) -->
+  <div id="screen-result" class="screen">
+    <div class="result-container">
+      <div class="result-icon" id="result-icon"></div>
+      <h2 id="result-title"></h2>
+      <div class="result-details" id="result-details"></div>
+      <div class="scores-display">
+        <div class="score-card" id="result-score-1"></div>
+        <div class="score-card" id="result-score-2"></div>
+      </div>
+      <button class="btn-primary" id="btn-next-round">ادامه</button>
+    </div>
+  </div>
+
+  <!-- Round Summary Screen (Fast Mode) -->
+  <div id="screen-summary" class="screen">
+    <div class="summary-container">
+      <h2 id="summary-title"></h2>
+      <div class="summary-list" id="summary-list"></div>
+      <div class="summary-total" id="summary-total"></div>
+      <div class="scores-display">
+        <div class="score-card" id="summary-score-1"></div>
+        <div class="score-card" id="summary-score-2"></div>
+      </div>
+      <button class="btn-primary" id="btn-next-summary">ادامه</button>
+    </div>
+  </div>
+
+  <!-- Game Over Screen -->
+  <div id="screen-gameover" class="screen">
+    <div class="gameover-container">
+      <h1 class="gameover-title" id="gameover-title"></h1>
+      <div class="gameover-winner" id="gameover-winner"></div>
+      <div class="scores-display final-scores">
+        <div class="score-card" id="final-score-1"></div>
+        <div class="score-card" id="final-score-2"></div>
+      </div>
+      <button class="btn-primary" id="btn-play-again">بازی دوباره</button>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
