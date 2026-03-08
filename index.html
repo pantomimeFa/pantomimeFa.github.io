@@ -2,7 +2,7 @@
 <html lang="fa" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
   <title>پانتومیم</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -31,7 +31,7 @@
         <span class="mode-label">حالت بازی:</span>
         <div class="toggle-buttons">
           <button class="toggle-btn active" data-mode="normal">عادی</button>
-          <button class="toggle-btn" data-mode="fast">سریع</button>
+          <button class="toggle-btn" data-mode="fast">جنگی</button>
         </div>
       </div>
 
@@ -52,11 +52,11 @@
 
   <!-- Category Selection Screen -->
   <div id="screen-categories" class="screen">
-    <div class="screen-top-bar">
-      <button class="btn-exit" id="btn-exit-game">خروج</button>
-    </div>
     <div class="screen-header">
-      <h2 class="turn-indicator" id="turn-indicator"></h2>
+      <div class="header-row">
+        <h2 class="turn-indicator" id="turn-indicator"></h2>
+        <button class="btn-exit" id="btn-exit-game">خروج</button>
+      </div>
       <p class="round-info" id="round-info"></p>
     </div>
     <div class="categories-grid" id="categories-grid"></div>

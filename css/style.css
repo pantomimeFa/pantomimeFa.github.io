@@ -2,6 +2,7 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  touch-action: manipulation;
 }
 
 :root {
@@ -267,12 +268,13 @@ body {
   font-size: 0.9rem;
 }
 
-/* Top bar with exit */
-.screen-top-bar {
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-  z-index: 10;
+/* Header row with team name and exit */
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
 }
 
 .btn-exit {
@@ -343,6 +345,56 @@ body {
 .category-name {
   font-size: 1rem;
   font-weight: 600;
+}
+
+/* ============ FUN MODE ============ */
+.ff-card {
+  background: linear-gradient(135deg, #2d1b69, #1a1a2e) !important;
+  border: 2px dashed #9b59b6 !important;
+  cursor: pointer;
+}
+
+.ff-card .ff-icon {
+  font-size: 2.4rem;
+}
+
+.ff-card:hover {
+  border-color: #e74c3c !important;
+}
+
+.ff-active {
+  background: linear-gradient(135deg, #e74c3c, #9b59b6) !important;
+  border: 2px solid #ffd700 !important;
+  animation: ffPulse 1s infinite;
+}
+
+@keyframes ffPulse {
+  0%, 100% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
+  50% { box-shadow: 0 0 25px rgba(255, 215, 0, 0.7); }
+}
+
+.fun-glow {
+  animation: funGlow 1.5s ease-in-out infinite alternate;
+  border: 2px solid rgba(255, 215, 0, 0.5) !important;
+}
+
+@keyframes funGlow {
+  0% {
+    box-shadow: 0 0 5px rgba(233, 69, 96, 0.3), 0 0 10px rgba(155, 89, 182, 0.2);
+  }
+  33% {
+    box-shadow: 0 0 10px rgba(52, 152, 219, 0.4), 0 0 20px rgba(46, 204, 113, 0.3);
+  }
+  66% {
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.4), 0 0 20px rgba(231, 76, 60, 0.3);
+  }
+  100% {
+    box-shadow: 0 0 15px rgba(155, 89, 182, 0.5), 0 0 25px rgba(52, 152, 219, 0.3);
+  }
+}
+
+.fun-glow .category-icon {
+  filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.6));
 }
 
 /* ============ LEVEL SCREEN ============ */

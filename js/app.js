@@ -1,3 +1,22 @@
+// ============ DISABLE BROWSER ZOOM ============
+document.addEventListener('keydown', function(e) {
+  if ((e.ctrlKey || e.metaKey) && (e.key === '+' || e.key === '-' || e.key === '=' || e.key === '0')) {
+    e.preventDefault();
+  }
+});
+document.addEventListener('wheel', function(e) {
+  if (e.ctrlKey) e.preventDefault();
+}, { passive: false });
+document.addEventListener('gesturestart', function(e) {
+  e.preventDefault();
+});
+document.addEventListener('gesturechange', function(e) {
+  e.preventDefault();
+});
+document.addEventListener('touchstart', function(e) {
+  if (e.touches.length > 1) e.preventDefault();
+}, { passive: false });
+
 // ============ STATE ============
 const state = {
   mode: 'normal', // 'normal' or 'fast'
@@ -11,6 +30,9 @@ const state = {
   roundTime: 120,
   selectedCategory: null,
   selectedLevel: null,
+  funMode: false, // Fun mode toggle
+  normalFunData: null,
+  fastFunData: null,
   usedWords: { normal: new Set(), fast: new Set() },
   // Track used category+level per team: usedCombos[teamIndex] = Set of "catId-level"
   usedCombos: [new Set(), new Set()],
@@ -31,12 +53,16 @@ const state = {
 
 // ============ INIT ============
 async function init() {
-  const [normalRes, fastRes] = await Promise.all([
+  const [normalRes, fastRes, normalFunRes, fastFunRes] = await Promise.all([
     fetch('data/normal.json').then(r => r.json()),
-    fetch('data/fast.json').then(r => r.json())
+    fetch('data/fast.json').then(r => r.json()),
+    fetch('data/normal_fun.json').then(r => r.json()).catch(() => null),
+    fetch('data/fast_fun.json').then(r => r.json()).catch(() => null)
   ]);
   state.normalData = normalRes;
   state.fastData = fastRes;
+  state.normalFunData = normalFunRes;
+  state.fastFunData = fastFunRes;
 
   bindEvents();
 }
@@ -169,17 +195,17 @@ function showCategoryScreen() {
 
 function renderCategories() {
   const grid = document.getElementById('categories-grid');
-  const data = state.mode === 'fast' ? state.fastData : state.normalData;
+  const data = getActiveData();
   const teamCombos = state.usedCombos[state.currentTeam];
   grid.innerHTML = '';
 
   data.categories.forEach(cat => {
     // Check if all levels for this category are used by this team
-    const levels = state.mode === 'fast' ? ['2'] : ['2', '4', '6'];
+    const levels = ['2', '4', '6'];
     const allUsed = levels.every(l => teamCombos.has(`${cat.id}-${l}`));
 
     const card = document.createElement('div');
-    card.className = 'category-card' + (allUsed ? ' disabled' : '');
+    card.className = 'category-card' + (allUsed ? ' disabled' : '') + (state.funMode ? ' fun-glow' : '');
     card.innerHTML = `
       <img class="category-icon" src="assets/icons/${cat.icon}" alt="${cat.name}">
       <span class="category-name">${cat.name}</span>
@@ -189,33 +215,49 @@ function renderCategories() {
     }
     grid.appendChild(card);
   });
+
+  // Add FF (Fun) button
+  const ffCard = document.createElement('div');
+  ffCard.className = 'category-card ff-card' + (state.funMode ? ' ff-active' : '');
+  ffCard.innerHTML = `
+    <span class="ff-icon">🤪</span>
+    <span class="category-name">FF</span>
+  `;
+  ffCard.addEventListener('click', toggleFunMode);
+  grid.appendChild(ffCard);
+}
+
+function getActiveData() {
+  if (state.funMode) {
+    return state.mode === 'fast' ? (state.fastFunData || state.fastData) : (state.normalFunData || state.normalData);
+  }
+  return state.mode === 'fast' ? state.fastData : state.normalData;
+}
+
+function toggleFunMode() {
+  state.funMode = !state.funMode;
+  renderCategories();
 }
 
 function selectCategory(cat) {
   state.selectedCategory = cat;
 
-  if (state.mode === 'fast') {
-    // Fast mode: skip level selection, default level 2
-    state.selectedLevel = 2;
-    showReadyScreen();
-  } else {
-    // Show level selection
-    const indicator = document.getElementById('level-turn-indicator');
-    indicator.textContent = `نوبت ${state.teams[state.currentTeam].name}`;
-    indicator.className = 'turn-indicator team' + (state.currentTeam + 1);
-    document.getElementById('selected-category-name').textContent = cat.name;
+  // Show level selection for both modes
+  const indicator = document.getElementById('level-turn-indicator');
+  indicator.textContent = `نوبت ${state.teams[state.currentTeam].name}`;
+  indicator.className = 'turn-indicator team' + (state.currentTeam + 1);
+  document.getElementById('selected-category-name').textContent = cat.name;
 
-    // Disable already-used levels for this team
-    const teamCombos = state.usedCombos[state.currentTeam];
-    document.querySelectorAll('.level-btn').forEach(btn => {
-      const level = btn.dataset.level;
-      const used = teamCombos.has(`${cat.id}-${level}`);
-      btn.classList.toggle('disabled', used);
-      btn.disabled = used;
-    });
+  // Disable already-used levels for this team
+  const teamCombos = state.usedCombos[state.currentTeam];
+  document.querySelectorAll('.level-btn').forEach(btn => {
+    const level = btn.dataset.level;
+    const used = teamCombos.has(`${cat.id}-${level}`);
+    btn.classList.toggle('disabled', used);
+    btn.disabled = used;
+  });
 
-    showScreen('screen-levels');
-  }
+  showScreen('screen-levels');
 }
 
 function selectLevel(level) {
@@ -235,7 +277,7 @@ function showReadyScreen() {
   if (state.mode === 'normal') {
     document.getElementById('ready-level').textContent = `سطح ${toPersianNum(state.selectedLevel)}`;
   } else {
-    document.getElementById('ready-level').textContent = 'حالت سریع';
+    document.getElementById('ready-level').textContent = `حالت جنگی — سطح ${toPersianNum(state.selectedLevel)}`;
   }
 
   showScreen('screen-ready');
@@ -344,7 +386,7 @@ function renderFastProgress() {
 function answerFast(correct) {
   state.fastResults.push(correct);
   if (correct) {
-    state.teams[state.currentTeam].score += 1;
+    state.teams[state.currentTeam].score += state.selectedLevel;
   }
   state.fastCurrentIndex++;
 
@@ -381,7 +423,7 @@ function showFastSummary() {
   });
 
   document.getElementById('summary-total').textContent =
-    `${toPersianNum(totalCorrect)} از ${toPersianNum(state.fastWords.length)} درست — ${toPersianNum(totalCorrect)} امتیاز`;
+    `${toPersianNum(totalCorrect)} از ${toPersianNum(state.fastWords.length)} درست — ${toPersianNum(totalCorrect * state.selectedLevel)} امتیاز`;
 
   renderScoreCards('summary');
   showScreen('screen-summary');
@@ -493,7 +535,7 @@ function renderScoreCards(prefix) {
 
 // ============ WORD SELECTION ============
 function getRandomWord(type) {
-  const data = type === 'fast' ? state.fastData : state.normalData;
+  const data = getActiveData();
   const cat = data.categories.find(c => c.id === state.selectedCategory.id);
   const words = cat.levels[String(state.selectedLevel)];
   const usedSet = state.usedWords[type];
@@ -511,7 +553,7 @@ function getRandomWord(type) {
 }
 
 function getRandomWords(type, count) {
-  const data = type === 'fast' ? state.fastData : state.normalData;
+  const data = getActiveData();
   const cat = data.categories.find(c => c.id === state.selectedCategory.id);
   const words = cat.levels[String(state.selectedLevel)];
   const usedSet = state.usedWords[type];
