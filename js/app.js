@@ -121,8 +121,19 @@ function bindEvents() {
   document.getElementById('btn-next-round').addEventListener('click', nextTurn);
   document.getElementById('btn-next-summary').addEventListener('click', nextTurn);
 
+  // Exit game
+  document.getElementById('btn-exit-game').addEventListener('click', () => {
+    if (confirm('آیا از خروج از بازی مطمئن هستید؟')) {
+      clearInterval(state.timerInterval);
+      stopTickSound();
+      clearSavedState();
+      showScreen('screen-home');
+    }
+  });
+
   // Play again
   document.getElementById('btn-play-again').addEventListener('click', () => {
+    clearSavedState();
     showScreen('screen-home');
   });
 }
@@ -525,5 +536,92 @@ function toPersianNum(num) {
   return String(num).replace(/\d/g, d => persianDigits[d]);
 }
 
+// ============ STATE PERSISTENCE ============
+const SAVE_KEY = 'panto-game-state';
+
+function saveState(screenId) {
+  const data = {
+    mode: state.mode,
+    teams: state.teams,
+    currentTeam: state.currentTeam,
+    currentRound: state.currentRound,
+    totalRounds: state.totalRounds,
+    roundTime: state.roundTime,
+    usedCombos: [
+      Array.from(state.usedCombos[0]),
+      Array.from(state.usedCombos[1])
+    ],
+    usedWords: {
+      normal: Array.from(state.usedWords.normal),
+      fast: Array.from(state.usedWords.fast)
+    },
+    screenId: screenId
+  };
+  localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+}
+
+function clearSavedState() {
+  localStorage.removeItem(SAVE_KEY);
+}
+
+function loadSavedState() {
+  const raw = localStorage.getItem(SAVE_KEY);
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+function restoreGame(saved) {
+  state.mode = saved.mode;
+  state.teams = saved.teams;
+  state.currentTeam = saved.currentTeam;
+  state.currentRound = saved.currentRound;
+  state.totalRounds = saved.totalRounds;
+  state.roundTime = saved.roundTime;
+  state.usedCombos = [
+    new Set(saved.usedCombos[0]),
+    new Set(saved.usedCombos[1])
+  ];
+  state.usedWords = {
+    normal: new Set(saved.usedWords.normal),
+    fast: new Set(saved.usedWords.fast)
+  };
+
+  // Restore home screen inputs to match
+  document.getElementById('team1-name').value = state.teams[0].name;
+  document.getElementById('team2-name').value = state.teams[1].name;
+  document.getElementById('round-time').value = state.roundTime;
+  document.getElementById('total-rounds').value = state.totalRounds;
+  document.querySelectorAll('.toggle-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.mode === state.mode);
+  });
+
+  // Go back to category selection (safest restore point)
+  showCategoryScreen();
+}
+
 // ============ START ============
-init();
+async function boot() {
+  await init();
+
+  // Auto-save at key moments by wrapping showScreen
+  const origShowScreen = showScreen;
+  showScreen = function(id) {
+    origShowScreen(id);
+    // Save on screens that represent stable states
+    if (id === 'screen-categories' || id === 'screen-result' || id === 'screen-summary') {
+      saveState(id);
+    }
+  };
+
+  // Check for saved game
+  const saved = loadSavedState();
+  if (saved) {
+    restoreGame(saved);
+  }
+}
+
+boot();

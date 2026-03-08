@@ -267,9 +267,35 @@ body {
   font-size: 0.9rem;
 }
 
+/* Top bar with exit */
+.screen-top-bar {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  z-index: 10;
+}
+
+.btn-exit {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 0.85rem;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-exit:active {
+  background: rgba(255, 71, 87, 0.2);
+  color: var(--fail);
+  border-color: var(--fail);
+}
+
 #screen-categories.active {
   justify-content: flex-start;
-  padding-top: 40px;
+  padding-top: 20px;
 }
 
 .categories-grid {
