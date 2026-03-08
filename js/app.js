@@ -193,6 +193,16 @@ function selectCategory(cat) {
     indicator.textContent = `نوبت ${state.teams[state.currentTeam].name}`;
     indicator.className = 'turn-indicator team' + (state.currentTeam + 1);
     document.getElementById('selected-category-name').textContent = cat.name;
+
+    // Disable already-used levels for this team
+    const teamCombos = state.usedCombos[state.currentTeam];
+    document.querySelectorAll('.level-btn').forEach(btn => {
+      const level = btn.dataset.level;
+      const used = teamCombos.has(`${cat.id}-${level}`);
+      btn.classList.toggle('disabled', used);
+      btn.disabled = used;
+    });
+
     showScreen('screen-levels');
   }
 }
@@ -224,6 +234,10 @@ function startRound() {
   initAudio();
   state.timeLeft = state.roundTime;
   state.roundStartTime = Date.now();
+
+  // Record this category+level as used for this team
+  const comboKey = `${state.selectedCategory.id}-${state.selectedLevel}`;
+  state.usedCombos[state.currentTeam].add(comboKey);
 
   if (state.mode === 'normal') {
     startNormalRound();

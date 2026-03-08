@@ -297,9 +297,15 @@ body {
   transform: scale(0.95);
 }
 
-.category-card:hover {
+.category-card:hover:not(.disabled) {
   border-color: var(--accent);
   background: var(--bg-secondary);
+}
+
+.category-card.disabled {
+  opacity: 0.3;
+  pointer-events: none;
+  filter: grayscale(1);
 }
 
 .category-icon {
@@ -363,8 +369,14 @@ body {
   transform: scale(0.95);
 }
 
-.level-btn:hover {
+.level-btn:hover:not(.disabled) {
   border-color: var(--accent);
+}
+
+.level-btn.disabled {
+  opacity: 0.3;
+  pointer-events: none;
+  filter: grayscale(1);
 }
 
 .level-btn[data-level="2"] { border-bottom: 4px solid var(--success); }
